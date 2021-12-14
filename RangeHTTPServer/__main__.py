@@ -19,12 +19,16 @@ except ImportError:
     import SimpleHTTPServer
 
 from . import RangeRequestHandler
+from . import extra_args
 
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('port', action='store',
                     default=8000, type=int,
                     nargs='?', help='Specify alternate port [default: 8000]')
+parser.add_argument('--response-latency', default=0, type=float)
 
 args = parser.parse_args()
+extra_args['response_latency'] = args.response_latency
+
 SimpleHTTPServer.test(HandlerClass=RangeRequestHandler, port=args.port)

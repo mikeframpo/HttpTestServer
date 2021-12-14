@@ -12,6 +12,7 @@ browser all at once.
 
 import os
 import re
+import time
 
 try:
     # Python3
@@ -21,6 +22,10 @@ except ImportError:
     # Python 2
     from SimpleHTTPServer import SimpleHTTPRequestHandler
 
+extra_args = {
+    # the delay prior to response returning
+    'response_latency': 0.0
+}
 
 def copy_byte_range(infile, outfile, start=None, stop=None, bufsize=16*1024):
     '''Like shutil.copyfileobj, but only copy a range of the streams.
@@ -63,6 +68,13 @@ class RangeRequestHandler(SimpleHTTPRequestHandler):
     - Override copyfile to only transmit a range when requested.
     """
     def send_head(self):
+        latency = extra_args['response_latency']
+        if latency < 0:
+            while True:
+                time.sleep(1.0)
+        else:
+            time.sleep(latency)
+
         if 'Range' not in self.headers:
             self.range = None
             return SimpleHTTPRequestHandler.send_head(self)
